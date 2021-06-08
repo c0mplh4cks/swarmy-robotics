@@ -6,6 +6,8 @@
 
 
 void setup() {
+  Serial.begin(115200);
+  
   MOTOR_setup();
   RGB_setup();
   OLED_setup();
