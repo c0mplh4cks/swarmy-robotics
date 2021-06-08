@@ -5,6 +5,17 @@ int S0 = 27;
 int S1 = 26;
 int S2 = 25;
 
+int MultiPins[8][3] = {
+  {0, 0, 0},
+  {1, 0, 0},
+  {0, 1, 0},
+  {1, 1, 0},
+  {0, 0, 1},
+  {1, 0, 1},
+  {0, 1, 1},
+  {1, 1, 1}
+};
+
 
 
 void IR_SWITCH(int s) {
@@ -16,6 +27,16 @@ void IR_SWITCH(int s) {
     digitalWrite(irLedSwitchPin, HIGH);
     Serial.print(" IrledON ");
   }
+}
+
+
+
+int IR_RECV(int index) {
+  digitalWrite(S0, MultiPins[index][0]);
+  digitalWrite(S1, MultiPins[index][1]);
+  digitalWrite(S2, MultiPins[index][2]);
+
+  return map(analogRead(34), 0, 4096, 1, 255);
 }
 
 
