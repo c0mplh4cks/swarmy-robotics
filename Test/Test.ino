@@ -141,7 +141,7 @@ void loop() {
   /* IR SENSOR */
   for (int i=0; i<8; i++) {
     RGB_OFF();
-    RGB_SET(i, 255, 255, 255, 20);
+    RGB_SET(i, 255, 0, 0, 10);
     delay(10);
     RGB_UPDATE();
     while (BUTTON() == false) {
