@@ -39,8 +39,23 @@ void loop() {
   /* Motor */
   while (BUTTON() == false) {
     OLED("MOTOR TEST", "", "");
-    
-    for (int i=-255; i<256; i++) {
+
+    for (int i=0; i>-256; i--) {
+      SET_MOTOR(0, i);
+      SET_MOTOR(1, i);
+      delay(10);
+    }
+    for (int i=-255; i<0; i++) {
+      SET_MOTOR(0, i);
+      SET_MOTOR(1, i);
+      delay(10);
+    }
+    for (int i=0; i<256; i++) {
+      SET_MOTOR(0, i);
+      SET_MOTOR(1, i);
+      delay(10);
+    }
+    for (int i=255; i>0; i--) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
       delay(10);
