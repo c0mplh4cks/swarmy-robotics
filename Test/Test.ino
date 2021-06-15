@@ -27,8 +27,14 @@ void setup() {
 void loop() {
   /* OLED */
   while (BUTTON() == false) {
-    OLED("Good morning", "Goedemorgen", "Dobroe utra");
-    delay(50);
+    OLED("- SWARMY TESTING -", "PresS thE buTton", "to StarT...");
+    delay(100);
+    OLED("\\ SWARMY TESTING /", "pRess_the_butTon", "To sTart,..");
+    delay(100);
+    OLED("| SWARMY TESTING |", "prEss The ButtOn", "tO stArt.,.");
+    delay(100);
+    OLED("/ SWARMY TESTING \\", "preSs tHe bUttoN", "to_staRt..,");
+    delay(100);
   }
   OLED("", "", "");
   
@@ -38,23 +44,25 @@ void loop() {
   
   /* Motor */
   while (BUTTON() == false) {
-    OLED("MOTOR TEST", "", "");
-
+    OLED("MOTOR TEST", "", "0 to -255");
     for (int i=0; i>-256; i--) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
       delay(10);
     }
+    OLED("MOTOR TEST", "", "-255 to 0");
     for (int i=-255; i<0; i++) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
       delay(10);
     }
+    OLED("MOTOR TEST", "", "0 to 255");
     for (int i=0; i<256; i++) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
       delay(10);
     }
+    OLED("MOTOR TEST", "", "255 to 0");
     for (int i=255; i>0; i--) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
