@@ -140,6 +140,10 @@ void loop() {
 
   /* IR SENSOR */
   for (int i=0; i<8; i++) {
+    RGB_OFF();
+    RGB_SET(i, 255, 255, 255, 20);
+    delay(10);
+    RGB_UPDATE();
     while (BUTTON() == false) {
       OLED("IR SENSOR TEST", "index: " + String(i), "value: " + String(IR_RECV(i)));
       delay(50);  
@@ -147,9 +151,11 @@ void loop() {
     delay(500);
     BUTTON_OFF();
   }
-
+  
   delay(100);
-
+  RGB_OFF();
+  delay(10);
+  RGB_UPDATE();
 
   /* IR LED */
   while (BUTTON() == false) {
