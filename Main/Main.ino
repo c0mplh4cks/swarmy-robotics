@@ -17,6 +17,7 @@ void setup() {
   OLED_setup();
   IR_setup();
   ENCODER_setup();
+  BUTTON_setup();
 
   SET_MOTOR(0, 0);
   SET_MOTOR(1, 0);
@@ -26,9 +27,18 @@ void setup() {
 
   delay(100);
 
-  LPS_TARGET_ON(-200, 100, 50);
-  LPS_SET_PID(0.1, 0, -1, 0);
+  LPS_TARGET_ON(-200, 100, 5);
+  LPS_SET_PID(0.1, 0, -1, 50);
   RGB_OFF();
+
+  while (BUTTON() == false) {
+    OLED("Press button", "to start", "");
+    delay(100);
+  }
+  OLED("", "", "");
+
+  delay(100);
+  BUTTON_OFF();
 
 }
 
@@ -38,7 +48,6 @@ int i = 0;
 float start_time = millis();
 float start_loop_time = millis();
 float loop_time = 0;
-float prev_speed = 0;
 
 
 

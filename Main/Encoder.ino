@@ -68,13 +68,13 @@ float ENC_MM(int index) {
 float ENC_SPD(int index, float loop_time) {
   if (index == 0) {
     float diff = encoderValue0 - encoderPrev0;
-    float spd = diff / loop_time;
+    float spd = diff / (loop_time / 1000);
     encoderPrev0 = encoderValue0;
     return spd;
     
   } else if (index == 1) {
     float diff = encoderValue1 - encoderPrev1;
-    float spd = diff / loop_time;
+    float spd = diff / (loop_time / 1000);
     encoderPrev1 = encoderValue1;
     return spd;
     
