@@ -10,7 +10,7 @@ float targetoff = 0;
 
 float radius = 0;
 float rotspeed = 0;
-float axel = 73.5;
+float axel = 7.35;
 
 bool pid = false;
 float pid_p = 0;

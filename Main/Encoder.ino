@@ -4,8 +4,10 @@
 
 volatile long encoderValue0 = 0;
 volatile long encoderValue1 = 0;
+volatile long encoderPrev0 = 0;
+volatile long encoderPrev1 = 0;
 
-float wheel_dia = 115;
+float wheel_dia = 11.5;
 float pulse_rpm = 350;
 float pulse_mm = wheel_dia / pulse_rpm;
 
@@ -58,5 +60,23 @@ float ENC_MM(int index) {
     return encoderValue0*pulse_mm;
   } else if (index == 1) {
     return encoderValue1*pulse_mm;
+  }
+}
+
+
+
+float ENC_SPD(int index, float loop_time) {
+  if (index == 0) {
+    float diff = encoderValue0 - encoderPrev0;
+    float spd = diff / loop_time;
+    encoderPrev0 = encoderValue0;
+    return spd;
+    
+  } else if (index == 1) {
+    float diff = encoderValue1 - encoderPrev1;
+    float spd = diff / loop_time;
+    encoderPrev1 = encoderValue1;
+    return spd;
+    
   }
 }

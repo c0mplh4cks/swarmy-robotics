@@ -16,6 +16,7 @@ void setup() {
   RGB_setup();
   OLED_setup();
   IR_setup();
+  ENCODER_setup();
 
   SET_MOTOR(0, 0);
   SET_MOTOR(1, 0);
@@ -23,10 +24,11 @@ void setup() {
   RGB_UPDATE();
   IR_SWITCH(0);
 
-  delay(50);
+  delay(100);
 
-  LPS_TARGET_ON(-2000, 1000, 50);
+  LPS_TARGET_ON(-200, 100, 50);
   LPS_SET_PID(0.1, 0, -1, 0);
+  RGB_OFF();
 
 }
 
@@ -44,7 +46,7 @@ void loop() {
   loop_time = millis() - start_loop_time;
   start_loop_time = millis();
   
-  int* result = LPS_UPDATE( loop_time, ENC_MM(0), ENC_MM(1) );
+  int* result = LPS_UPDATE( loop_time, ENC_SPD(0, loop_time), ENC_SPD(1, loop_time) );
   if (LPS_INFO(0) && LPS_INFO(1)) {
     SET_MOTOR(0, result[0]);
     SET_MOTOR(1, result[1]);
@@ -53,9 +55,6 @@ void loop() {
     LPS_PID_OFF();
     SET_MOTOR(0, 0);
     SET_MOTOR(1, 0);
-    delay(2000);
-    LPS_SET_PID(0.1, 0, -1, 0);
-    LPS_TARGET_ON(200, 100, 5);
   }
   
   float* crd = LPS_CRD();
