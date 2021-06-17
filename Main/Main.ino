@@ -1,7 +1,11 @@
 #include <Arduino.h>
+#include "math.h"
 #include "Wire.h"
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
+
+
+float radian = 57.2957795;
 
 
 
@@ -13,25 +17,54 @@ void setup() {
   OLED_setup();
   IR_setup();
 
-  //SET_MOTOR(0, 80);
-  //SET_MOTOR(1, 40);
+  SET_MOTOR(0, 0);
+  SET_MOTOR(1, 0);
 
-  RGB(0, 255, 0, 0, 20);
-  //OLED("POTATO", "42", "SWARMY");
+  RGB_UPDATE();
   IR_SWITCH(0);
+
+  delay(50);
+
+  LPS_TARGET_ON(-2000, 1000, 50);
+  LPS_SET_PID(0.1, 0, -1, 0);
 
 }
 
-void loop() {
-  /*for (int i=0; i<8; i++) {
-    Serial.println( IR_RECV(i) );
-  }*/
-  
-  for (int i=0; i<8; i++) {
-    RGB(i, 0, 0, 0, 20);
-    RGB((i+1)%8, 255, 0, 0, 20);
-    OLED(0, String(i));
-    delay(500);
-  }
 
+
+int i = 0;
+float start_time = millis();
+float start_loop_time = millis();
+float loop_time = 0;
+float prev_speed = 0;
+
+
+
+void loop() {
+  loop_time = millis() - start_loop_time;
+  start_loop_time = millis();
+  
+  int* result = LPS_UPDATE( loop_time, ENC_MM(0), ENC_MM(1) );
+  if (LPS_INFO(0) && LPS_INFO(1)) {
+    SET_MOTOR(0, result[0]);
+    SET_MOTOR(1, result[1]);
+    
+  } else if (LPS_INFO(0)) {
+    LPS_PID_OFF();
+    SET_MOTOR(0, 0);
+    SET_MOTOR(1, 0);
+    delay(2000);
+    LPS_SET_PID(0.1, 0, -1, 0);
+    LPS_TARGET_ON(200, 100, 5);
+  }
+  
+  float* crd = LPS_CRD();
+
+  /* DEBUG */
+  int bot_direction = crd[2];
+  String ROW1 = "x:" + String(crd[0]) + " y:" + String(crd[1]);
+  String ROW2 = "l:" + String(MOTOR_SPD(0)) + " r:" + String(MOTOR_SPD(1)) + " a:" + String(bot_direction%360);
+  String ROW3 = "d:" + String(LPS_INFO(4)) + " e:" + String(LPS_INFO(6));
+  OLED(ROW1, ROW2, ROW3);
+  /* DEBUG */
 }
