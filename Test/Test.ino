@@ -41,10 +41,11 @@ void loop() {
   
   delay(100);
   BUTTON_OFF();
+  
 
   /* Encoder */
   while (BUTTON() == false) {
-    OLED("ENCODER TEST", "index 0: " + String(ENCODER(0)), "index 1: " + String(ENCODER(1)));
+    OLED("ENCODER TEST", "index 0: " + String(ENC_MM(0)), "index 1: " + String(ENC_MM(1)));
     delay(50);
   }
   OLED("", "", "");
@@ -85,6 +86,7 @@ void loop() {
   
   delay(100);
   BUTTON_OFF();
+
   
   /* RGB */
   while (BUTTON() == false) {
