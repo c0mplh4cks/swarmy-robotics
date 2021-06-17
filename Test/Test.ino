@@ -17,6 +17,7 @@ void setup() {
   OLED_setup();
   IR_setup();
   BUTTON_setup();
+  ENCODER_setup();
 
   RGB_UPDATE();
   IR_SWITCH(0);
@@ -38,6 +39,16 @@ void loop() {
   }
   OLED("", "", "");
   
+  delay(100);
+  BUTTON_OFF();
+
+  /* Encoder */
+  while (BUTTON() == false) {
+    OLED("ENCODER TEST", "index 0: " + String(ENCODER(0)), "index 1: " + String(ENCODER(1)));
+    delay(50);
+  }
+  OLED("", "", "");
+
   delay(100);
   BUTTON_OFF();
   

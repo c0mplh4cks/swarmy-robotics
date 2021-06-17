@@ -1,5 +1,5 @@
 int pinButton = 35;
-bool ButtonValue = false;
+volatile bool ButtonValue = false;
 
 
 

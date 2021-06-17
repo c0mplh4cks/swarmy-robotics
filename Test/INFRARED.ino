@@ -33,7 +33,7 @@ int IR_RECV(int index) {
   digitalWrite(S1, MultiPins[index][1]);
   digitalWrite(S2, MultiPins[index][2]);
 
-  return map(analogRead(34), 0, 4096, 1, 255);
+  return map(analogRead(34), 0, 4096, 255, 0);
 }
 
 
