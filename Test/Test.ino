@@ -56,29 +56,29 @@ void loop() {
   
   /* Motor */
   while (BUTTON() == false) {
-    OLED("MOTOR TEST", "", "0 to -255");
-    for (int i=0; i>-256; i--) {
+    for (int i=0; i>-256; i=i-5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      delay(10);
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      delay(50);
     }
-    OLED("MOTOR TEST", "", "-255 to 0");
-    for (int i=-255; i<0; i++) {
+    for (int i=-255; i<0; i=i+5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      delay(10);
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      delay(50);
     }
-    OLED("MOTOR TEST", "", "0 to 255");
-    for (int i=0; i<256; i++) {
+    for (int i=0; i<256; i=i+5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      delay(10);
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      delay(50);
     }
-    OLED("MOTOR TEST", "", "255 to 0");
-    for (int i=255; i>0; i--) {
+    for (int i=255; i>0; i=i-5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      delay(10);
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      delay(50);
     }
     SET_MOTOR(0, 0);
     SET_MOTOR(1, 0);

@@ -27,7 +27,7 @@ void updateEncoder0() {
   int spd = MOTOR_SPD(0);
   if (spd > 0) {
     encoderValue0++; 
-  } else {
+  } else if (spd < 0) {
     encoderValue0--;
   }
 }
@@ -36,7 +36,7 @@ void updateEncoder1() {
   int spd = MOTOR_SPD(1);
   if (spd > 0) {
     encoderValue1++; 
-  } else {
+  } else if (spd < 0) {
     encoderValue1--;
   }
 }
