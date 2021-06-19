@@ -33,7 +33,7 @@ int IR_RECV(int index) {
   digitalWrite(S1, MultiPins[index][1]);
   digitalWrite(S2, MultiPins[index][2]);
 
-  return map(analogRead(34), 0, 4096, 255, 0);
+  return map(analogRead(34), 0, 4096, 4096, 0);
 }
 
 
@@ -51,8 +51,8 @@ float* IR_CG(float f) {
     sumY = sumY + sin( (360/8*i+90)/radian ) * weights[i];
   }
 
-  float crd[2];
-  crd[0] = (1/sumM) * sumX * f;
+  static float crd[2];
+  crd[0] = (1/sumM) * sumX * f *-1;
   crd[1] = (1/sumM) * sumY * f;
 
   return crd;

@@ -10,7 +10,7 @@ float targetoff = 0;
 
 float radius = 0;
 float rotspeed = 0;
-float axel = 73.5;
+float axel = 7.35;
 
 bool pid = false;
 float pid_p = 0;
@@ -24,21 +24,24 @@ float mspd = 255;
 
 
 
-int* LPS_UPDATE(float loop_time, int mspdL, int mspdR) {
+int* LPS_UPDATE(float loop_time, float mspdL, float mspdR) {
   tankangle(mspdL, mspdR);
-  float a = (loop_time / 1000) * rotspeed;
+  Serial.println(rotspeed);
+  Serial.println(dir);
+  Serial.println(mspdL);
+  Serial.println(mspdR);
+  float a = rotspeed; // / (loop_time / 1000);
   
   if (mspdL != mspdR) {
     float* rtp = rotatep(botx+radius, boty, botx, boty, dir);
     float* nbot = rotatep(botx, boty, rtp[0], rtp[1], a);
     botx = nbot[0];
     boty = nbot[1];
-    //dir = (dir + a)%360;  
     dir = fmodf((dir + a), 360);
   
   } else {
-    float spd = (loop_time / 1000) * mspdL;
-    float* nbot = rotatep(botx, boty+spd, botx, boty, dir);
+    float dst = mspdL;// * (loop_time / 1000);
+    float* nbot = rotatep(botx, boty+dst, botx, boty, dir);
     botx = nbot[0];
     boty = nbot[1];
   }
@@ -56,7 +59,8 @@ int* LPS_UPDATE(float loop_time, int mspdL, int mspdR) {
     }
   }
 
-  int* ctrl = LPS_PID_CTRL(LPS_PID(loop_time), pid_speed);  
+  int* ctrl = LPS_PID_CTRL(LPS_PID(loop_time), pid_speed); 
+  Serial.println(); 
   
   return ctrl;
 }
@@ -81,9 +85,10 @@ void LPS_PID_OFF() {
 
 float LPS_PID(float loop_time) { 
   float error = angle(botx, boty, targetx, targety) - dir;
-  float diff = (prev_error - error);
+  float diff = (error - prev_error);
   tot_error = tot_error + error;
   float result = (pid_p * error) + (pid_i * tot_error) + (pid_d * diff);
+  Serial.println(result);
 
   return result;  
 }

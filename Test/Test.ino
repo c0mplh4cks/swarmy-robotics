@@ -21,6 +21,9 @@ void setup() {
 
   RGB_UPDATE();
   IR_SWITCH(0);
+
+  delay(100);
+  RGB_OFF();
 }
 
 
@@ -42,10 +45,25 @@ void loop() {
   delay(100);
   BUTTON_OFF();
   
+  /* IR CG */
+  IR_SWITCH(1);
+  
+  while (BUTTON() == false) {
+    float* cg = IR_CG(100u);
+    
+    OLED("IR CG TEST", "cgx:" + String(cg[0]), "cgy:" + String(cg[1]));
+    delay(50);
+  }
+  OLED("", "", "");
+
+  delay(100);
+  BUTTON_OFF();
+  IR_SWITCH(0);
+  
 
   /* Encoder */
   while (BUTTON() == false) {
-    OLED("ENCODER TEST", "index 0: " + String(ENC_MM(0)), "index 1: " + String(ENC_MM(1)));
+    OLED("ENCODER TEST", "index 0: " + String(ENC_DIST(0)), "index 1: " + String(ENC_DIST(1)));
     delay(50);
   }
   OLED("", "", "");
@@ -59,25 +77,25 @@ void loop() {
     for (int i=0; i>-256; i=i-5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_DIST(0)) + " 1:" + String(ENC_DIST(1)));
       delay(50);
     }
     for (int i=-255; i<0; i=i+5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_DIST(0)) + " 1:" + String(ENC_DIST(1)));
       delay(50);
     }
     for (int i=0; i<256; i=i+5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_DIST(0)) + " 1:" + String(ENC_DIST(1)));
       delay(50);
     }
     for (int i=255; i>0; i=i-5) {
       SET_MOTOR(0, i);
       SET_MOTOR(1, i);
-      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_MM(0)) + " 1:" + String(ENC_MM(1)));
+      OLED("MOTOR TEST", "spd 0:" + String(MOTOR_SPD(0)) + " 1:" + String(MOTOR_SPD(1)), "enc 0:" + String(ENC_DIST(0)) + " 1:" + String(ENC_DIST(1)));
       delay(50);
     }
     SET_MOTOR(0, 0);
