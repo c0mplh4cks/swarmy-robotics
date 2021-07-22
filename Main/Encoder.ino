@@ -1,18 +1,18 @@
 #define ENCODEROUTPUT 32
 
-
-
 volatile long encoderValue0 = 0;
 volatile long encoderValue1 = 0;
 volatile long encoderPrev0 = 0;
 volatile long encoderPrev1 = 0;
 
-float wheel_dia = 11.5;
-float pulse_rpm = 350;
-float pulse_mm = wheel_dia / pulse_rpm;
+double wheel_dia = 11.5;
+double pulse_rpm = 350;
+double pulse_pd = wheel_dia / pulse_rpm;
 
-int encoderPin0 = 36;
-int encoderPin1 = 39;
+int encoderPin0 = 39;
+int encoderPin1 = 36;
+
+
 
 
 
@@ -55,26 +55,26 @@ int ENC_PULSES(int index) {
 
 
 
-float ENC_MM(int index) {
+double ENC_DST(int index) {
   if (index == 0) {
-    return encoderValue0*pulse_mm;
+    return encoderValue0*pulse_pd;
   } else if (index == 1) {
-    return encoderValue1*pulse_mm;
+    return encoderValue1*pulse_pd;
   }
 }
 
 
 
-float ENC_SPD(int index, float loop_time) {
+double ENC_SPD(int index) {
   if (index == 0) {
-    float diff = encoderValue0 - encoderPrev0;
-    float spd = diff / (loop_time / 1000);
+    double diff = encoderValue0 - encoderPrev0;
+    double spd = diff * pulse_pd; 
     encoderPrev0 = encoderValue0;
     return spd;
     
   } else if (index == 1) {
-    float diff = encoderValue1 - encoderPrev1;
-    float spd = diff / (loop_time / 1000);
+    double diff = encoderValue1 - encoderPrev1;
+    double spd = diff * pulse_pd; 
     encoderPrev1 = encoderValue1;
     return spd;
     

@@ -1,52 +1,66 @@
 // Local Positioning System
-float botx = 0;
-float boty = 0;
-float dir = 0;
+double botx = 0;
+double boty = 0;
+double dir = 0;
+double angleoff = 5;
 
 bool target = false;
-float targetx = 0;
-float targety = 0;
-float targetoff = 0;
+double targetx = 0;
+double targety = 0;
+double targetoff = 0;
 
-float radius = 0;
-float rotspeed = 0;
-float axel = 7.35;
+double radius = 0;
+double rotspeed = 0;
+double axel = 7.5;
 
 bool pid = false;
-float pid_p = 0;
-float pid_i = 0;
-float pid_d = 0;
-float pid_speed = 0;
-float prev_error = 0;
-float tot_error = 0;
+double pid_p = 0;
+double pid_i = 0;
+double pid_d = 0;
+double pid_speed = 0;
+double prev_error = 0;
+double tot_error = 0;
 
-float mspd = 255;
+double mspd = 255;
 
 
 
-int* LPS_UPDATE(float loop_time, int mspdL, int mspdR) {
+double* LPS_UPDATE(double loop_time, double mspdL, double mspdR) {
   tankangle(mspdL, mspdR);
-  float a = rotspeed / (loop_time / 1000);
+  double a = rotspeed;
   
   if (mspdL != mspdR) {
-    float* rtp = rotatep(botx+radius, boty, botx, boty, dir);
-    float* nbot = rotatep(botx, boty, rtp[0], rtp[1], a);
+    double* rtp = rotatep(botx+radius, boty, botx, boty, dir);
+    double* nbot = rotatep(botx, boty, rtp[0], rtp[1], a);
     botx = nbot[0];
-    dir = fmodf((dir + a), 360);
+    boty = nbot[1];
+    dir = dir + a;
+    if (dir >= 180) {dir = dir-360;}
+    if (dir < -180) {dir = dir+360;} 
   
   } else {
-    float dst = mspdL * (loop_time / 1000);
-    float* nbot = rotatep(botx, boty+dst, botx, boty, dir);
+    double dst = mspdL;
+    double* nbot = rotatep(botx, boty+dst, botx, boty, dir);
     botx = nbot[0];
     boty = nbot[1];
   }
 
   if (target == true) {
-    float d = distance(botx, boty, targetx, targety);
+    double spd_brake;
+    double d = distance(botx, boty, targetx, targety);
+    double ta = angle(botx, boty, targetx, targety, 0);
     
-    if (d <= targetoff) {
+    if (pid_speed != 0) {
+      double spd_brake = d / abs(pid_speed);
+      double pwm_brake = BRAKE_TIME(loop_time);
+      if (spd_brake < pwm_brake) {
+        pid_speed = 5 * (abs(pid_speed)/pid_speed);
+      }
+    }
+    
+    if ((d <= targetoff) || ((abs(ta-dir) < angleoff) && (pid_speed == 0))) {
       target = false;
-      static int result[2]; 
+      static double result[2]; 
       result[0] = 0;
       result[1] = 0;
       
@@ -54,19 +68,18 @@ int* LPS_UPDATE(float loop_time, int mspdL, int mspdR) {
     }
   }
 
-  int* ctrl = LPS_PID_CTRL(LPS_PID(loop_time), pid_speed);  
+  double* ctrl = LPS_PID_CTRL(LPS_PID(loop_time, pid_speed), pid_speed); 
   
   return ctrl;
 }
 
 
 
-void LPS_SET_PID(float p, float i, float d, int spd) {
+void LPS_SET_PID(double p, double i, double d, int spd) {
   pid_p = p;
   pid_i = i;
   pid_d = d;
   pid_speed = spd;
-  pid = true;
 }
 
 void LPS_PID_OFF() {
@@ -75,39 +88,50 @@ void LPS_PID_OFF() {
   pid = false;
 }
 
+void LPS_PID_ON() {
+  pid = true;
+}
 
 
-float LPS_PID(float loop_time) { 
-  float error = angle(botx, boty, targetx, targety) - dir;
-  float diff = (prev_error - error);
-  tot_error = tot_error + error;
-  float result = (pid_p * error) + (pid_i * tot_error) + (pid_d * diff);
+
+double LPS_PID(double loop_time, double spd) { 
+  double cdir = dir;
+  if (spd < 0) {
+    cdir = dir + 180;
+  }
+  
+  double error = angle(botx, boty, targetx, targety, cdir); 
+  double diff = (error - prev_error);
+  if (pid) {tot_error = tot_error + error;}
+  if (abs(error) < angleoff) {tot_error = 0;}
+  double result = ((pid_p * error) + (pid_i * tot_error) + (pid_d * diff)) * pid;
+  if (pid) {prev_error = error;}
 
   return result;  
 }
 
 
 
-float lspd_to_rad(float lspd, float spd) {
-  float u = (axel / 2) * (2 * spd);
-  float l = (2 * lspd) - (2 * spd);
-  float rad = u / l;
+double lspd_to_rad(double lspd, double spd) {
+  double u = (axel / 2) * (2 * spd);
+  double l = (2 * lspd) - (2 * spd);
+  double rad = u / l;
    
   return rad;
 }
 
-float rspd_to_rad(float rspd, float spd) {
-  float u = (axel / 2) * (2 * spd);
-  float l = (2 * spd) - (2 * rspd);
-  float rad = u / l;
+double rspd_to_rad(double rspd, double spd) {
+  double u = (axel / 2) * (2 * spd);
+  double l = (2 * spd) - (2 * rspd);
+  double rad = u / l;
 
   return rad;
 }
 
 
 
-int* LPS_PID_CTRL(float ctrl, float spd) {
-  float lspd, rspd;
+double* LPS_PID_CTRL(double ctrl, double spd) {
+  double lspd, rspd;
   rspd = spd - 0.5 * ctrl;
   lspd = ctrl + rspd;
 
@@ -123,7 +147,7 @@ int* LPS_PID_CTRL(float ctrl, float spd) {
     lspd = -mspd;
   }
 
-  static int out[2];
+  static double out[2];
   out[0] = lspd;
   out[1] = rspd;
   
@@ -132,12 +156,11 @@ int* LPS_PID_CTRL(float ctrl, float spd) {
 
 
 
-void LPS_TARGET_ON(float x, float y, float error) {
+void LPS_TARGET_ON(double x, double y, double error) {
   targetx = x;
   targety = y;
   targetoff = error;
   target = true;
-  pid = true;
 }
 
 void LPS_TARGET_OFF() {
@@ -146,7 +169,7 @@ void LPS_TARGET_OFF() {
 
 
 
-float LPS_INFO(int index) {
+double LPS_INFO(int index) {
   if (index == 0) {
     return pid;
   } else if (index == 1) {
@@ -158,16 +181,16 @@ float LPS_INFO(int index) {
   } else if (index == 4) {
     return distance(botx, boty, targetx, targety);
   } else if (index == 5) {
-    return angle(botx, boty, targetx, targety);
+    return angle(botx, boty, targetx, targety, dir);
   } else if (index == 6) {
-    return (angle(botx, boty, targetx, targety) - dir);
+    return (angle(botx, boty, targetx, targety, dir));
   }
 }
 
 
 
-float* LPS_CRD() {
-  static float crd[3];
+double* LPS_CRD() {
+  static double crd[3];
   crd[0] = botx;
   crd[1] = boty;
   crd[2] = dir;
@@ -177,8 +200,8 @@ float* LPS_CRD() {
 
 
 
-void tankangle(float l, float r) {
-  float c, d, t, rl, rr;
+void tankangle(double l, double r) {
+  double c, d, t, rl, rr;
   
   if (l == r) {
     radius = 0;
@@ -206,10 +229,10 @@ void tankangle(float l, float r) {
 
 
 
-float* rotate(float x, float y, float a) {
+double* rotate(double x, double y, double a) {
   a = a / radian *-1;
 
-  static float crd[2];
+  static double crd[2];
   crd[0] = x * cos(a) - y * sin(a);
   crd[1] = x * sin(a) + y * cos(a);
   
@@ -219,8 +242,8 @@ float* rotate(float x, float y, float a) {
 
 
 
-float* rotatep(float x, float y, float mx, float my, float a) {
-  float* crd = rotate(x-mx, y-my, a);
+double* rotatep(double x, double y, double mx, double my, double a) {
+  double* crd = rotate(x-mx, y-my, a);
   crd[0] = crd[0] + mx;
   crd[1] = crd[1] + my;
 
@@ -229,25 +252,38 @@ float* rotatep(float x, float y, float mx, float my, float a) {
 
 
 
-float distance(float xa, float ya, float xb, float yb) {
-  float d = sqrt( sq(xa-xb) + sq(ya-yb ) );
+double distance(double xa, double ya, double xb, double yb) {
+  double d = sqrt( sq(xa-xb) + sq(ya-yb ) );
   return d;
 }
 
 
 
-float angle(float xa, float ya, float xb, float yb) {
-  float a;
-  if ((xb-xa) != 0) {
-    a = atan( (yb-ya) / (xb-xa) ) * radian;
-    a = (a-90) * -1;
+double angle(double xa, double ya, double xb, double yb, double dir) {
+  double a;
 
-    if ((xb-xa) < 0) {
-      a = a - 180;
+  double dx = (xb - xa);
+  double dy = (yb - ya);
+
+  if (dx == 0) {
+    if (yb < ya) {
+      a = dir - 180;
+    } else {
+      a = dir;
     }
-    
+  
   } else {
-    a = 0;
+    double r = (dy / dx);
+    a = atan(r)*radian - (90 - dir);
+  
+    if (xb < xa) {
+      a = a + 180;
+    }
+    if (a > 180) {
+      a = a - 360;
+    }
   }
-  return a;
+
+  a = fmodf((a*-1 + 180), 360) - 180;
+  return a;    
 }

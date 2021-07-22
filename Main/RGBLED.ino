@@ -58,4 +58,10 @@ void RGB_setup() {
   strip.begin();
   strip.setBrightness(ledBrightness);
   strip.show();
+
+  for (int i=0; i<8; i++) {
+    for (int c=0; c<3; c++) {
+      ledColors[i][c] = 0;
+    }
+  }
 }
